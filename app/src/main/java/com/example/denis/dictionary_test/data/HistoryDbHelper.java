@@ -1,13 +1,10 @@
 package com.example.denis.dictionary_test.data;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.example.denis.dictionary_test.history;
 
 import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry;
 import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.TABLE_NAME;
@@ -45,7 +42,8 @@ import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.T
                 TextEntry.COLUMN_TEXT + " TEXT NOT NULL, " +
                 TextEntry.COLUMN_TRANSLATED + " TEXT NOT NULL, " +
                 TextEntry.COLUMN_DIRECTION+ " TEXT NOT NULL, " +
-                TextEntry.COLUMN_FAVORITE + " INTEGER NOT NULL DEFAULT 0, UNIQUE ("+
+                TextEntry.COLUMN_FAVORITE + " INTEGER NOT NULL DEFAULT 0, " +
+                TextEntry.COLUMN_INHISTORY + " INTEGER NOT NULL DEFAULT 0, UNIQUE (" +
                 TextEntry.COLUMN_TEXT + ", " +
                 TextEntry.COLUMN_TRANSLATED + ", " +
                 TextEntry.COLUMN_DIRECTION + ") ON CONFLICT REPLACE);";
@@ -59,7 +57,8 @@ import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.T
             HistoryContract.TextEntry.COLUMN_TEXT,
             HistoryContract.TextEntry.COLUMN_TRANSLATED,
             HistoryContract.TextEntry.COLUMN_DIRECTION,
-            HistoryContract.TextEntry.COLUMN_FAVORITE};
+            HistoryContract.TextEntry.COLUMN_FAVORITE,
+            HistoryContract.TextEntry.COLUMN_INHISTORY};
 
 
     public static HistoryDbHelper instance(Context context) {

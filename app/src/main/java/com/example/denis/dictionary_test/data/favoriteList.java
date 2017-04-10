@@ -1,63 +1,35 @@
 package com.example.denis.dictionary_test.data;
 
-import android.app.Fragment;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 import com.example.denis.dictionary_test.R;
 
 /**
- * Created by Denis on 01.04.2017.
+ * Created by Denis on 10.04.2017.
  */
 
-
-
-public class historyList extends Fragment {
-    HistoryDbHelper mDbHelper ;
-    CheckBoxBinder mBinder;
+public class favoriteList extends AppCompatActivity {
+    HistoryDbHelper mDbHelper;
+    CheckBoxBinder mBinder = new CheckBoxBinder();
     ListView listView;
-    SimpleCursorAdapter cursorAdapter;
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        View ret = configureUI(inflater, container, savedInstanceState);
-        // Return the View
-        return ret;
-    }
-    // Ruesource id
-
-    int[] resourceIds = {
-            R.id.text,
-            R.id.translated,
-            R.id.direction,
-            R.id.checkBox
-    };
-
-    private View configureUI(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
-        final String METHOD = "configureUI(..., Bundle {" + savedInstanceState + "})";
-
-        // Inflate the layout from the XML definition
-        View ret = layoutInflater.inflate(R.layout.activity_history, container, false);
-
-        // Initialize the ListView
-        initListView(ret);
-
-        // Return the View
-        return ret;
-    }
-
-
-
-    public SimpleCursorAdapter initListView(View view) {
-        mDbHelper = new HistoryDbHelper(getActivity());
-        mBinder = new CheckBoxBinder();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_favorite);
+        int[] resourceIds = {
+                R.id.text,
+                R.id.translated,
+                R.id.direction,
+                R.id.checkBox
+        };
+        mDbHelper = new HistoryDbHelper(this);
         // Создадим и откроем для чтения базу данных
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
@@ -71,7 +43,7 @@ public class historyList extends Fragment {
         cursor = db.query(
                 HistoryContract.TextEntry.TABLE_NAME,   // таблица
                 null,            // столбцы
-                HistoryContract.TextEntry.COLUMN_INHISTORY + " = " + 1,                  // столбцы для условия WHERE
+                HistoryContract.TextEntry.COLUMN_FAVORITE + " = " + 1,                  // столбцы для условия WHERE
                 null,                  // значения для условия WHERE
                 null,                  // Don't group the rows
                 null,                  // Don't filter by row groups
@@ -79,13 +51,18 @@ public class historyList extends Fragment {
 
 
         // Set the Adapter
-        listView = (ListView) getView(view, R.id.listView_text);
-        cursorAdapter = new SimpleCursorAdapter(getActivity(), R.layout.list_row, cursor, mDbHelper.projection, resourceIds, 0);
+        listView = (ListView) findViewById(R.id.listview_fav);
+        SimpleCursorAdapter cursorAdapter = new SimpleCursorAdapter(this, R.layout.list_row, cursor, mDbHelper.projection, resourceIds, 0);
+        if(listView == null)
+            Log.e("ListFav", "GOVNO");
         cursorAdapter.setViewBinder(mBinder);
         listView.setAdapter(cursorAdapter);
-        return cursorAdapter;
     }
-
+    public void onDeleteFav(View view) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        db.delete(HistoryContract.TextEntry.TABLE_NAME,HistoryContract.TextEntry.COLUMN_FAVORITE + " = " + 1,null);
+        updateList();
+    }
     public void updateList(){
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
@@ -99,7 +76,7 @@ public class historyList extends Fragment {
         cursor = db.query(
                 HistoryContract.TextEntry.TABLE_NAME,   // таблица
                 null,            // столбцы
-                HistoryContract.TextEntry.COLUMN_INHISTORY + " = " + 1,                  // столбцы для условия WHERE
+                HistoryContract.TextEntry.COLUMN_FAVORITE + " = " + 1,                  // столбцы для условия WHERE
                 null,                  // значения для условия WHERE
                 null,                  // Don't group the rows
                 null,                  // Don't filter by row groups
@@ -109,12 +86,5 @@ public class historyList extends Fragment {
         sca.notifyDataSetChanged();
         listView.requestLayout();
 
-    }
-    private View getView(View parentView, int requestedViewId) {
-        View ret = parentView.findViewById(requestedViewId);
-        if (ret == null) {
-            throw new RuntimeException("View with ID: " + requestedViewId + " could not be found!");
-        }
-        return ret;
     }
 }

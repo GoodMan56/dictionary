@@ -18,5 +18,7 @@ public final class HistoryContract {
         public final static String COLUMN_TRANSLATED = "translated";
         public final static String COLUMN_DIRECTION = "direction";
         public final static String COLUMN_FAVORITE = "favorite";
+        public final static String COLUMN_INHISTORY = "inHistory";
+
     }
 }

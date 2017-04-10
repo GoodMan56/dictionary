@@ -1,21 +1,16 @@
 package com.example.denis.dictionary_test;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -41,7 +36,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.COLUMN_FAVORITE;
 import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry._ID;
 
 
@@ -187,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             mTextView.setText(translatedText);
                             mCheckBox = (CheckBox)findViewById(R.id.checkBox2);
                             //onCheckboxClicked(mCheckBox, text, translatedText,lang);
+
                             insertText(text, translatedText, lang, 0);
                             mCheckBox.setVisibility(View.VISIBLE);
                         } catch (JSONException e) {
@@ -215,14 +210,32 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void insertText(String text, String translated, String dir, int fav) {
 
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor cursor = null;
+        //
+        String orderBy = HistoryContract.TextEntry._ID;
+        // Делаем запрос
+        cursor = db.query(
+                HistoryContract.TextEntry.TABLE_NAME,   // таблица
+                null,            // столбцы
+                HistoryContract.TextEntry.COLUMN_FAVORITE + " = " + 1 +
+                        " AND " + HistoryContract.TextEntry.COLUMN_TEXT       + " = " + "\"" + text        + "\"" +
+                        " AND " + HistoryContract.TextEntry.COLUMN_TRANSLATED + " = " + "\"" + translated  + "\"" +
+                        " AND " + HistoryContract.TextEntry.COLUMN_DIRECTION  + " = " + "\"" + dir         + "\"",                  // столбцы для условия WHERE
+                null,                  // значения для условия WHERE
+                null,                  // Don't group the rows
+                null,                  // Don't filter by row groups
+                orderBy + " DESC");    // порядок сортировки
         // Gets the database in write mode
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        db = mDbHelper.getWritableDatabase();
+        mCheckBox.setChecked(cursor.getCount() != 0);
         // Создаем объект ContentValues
         ContentValues values = new ContentValues();
         values.put(HistoryContract.TextEntry.COLUMN_TEXT, text);
         values.put(HistoryContract.TextEntry.COLUMN_TRANSLATED, translated);
         values.put(HistoryContract.TextEntry.COLUMN_DIRECTION, dir);
-        values.put(HistoryContract.TextEntry.COLUMN_FAVORITE, fav);
+        values.put(HistoryContract.TextEntry.COLUMN_FAVORITE, cursor.getCount() != 0);
+        values.put(HistoryContract.TextEntry.COLUMN_INHISTORY, 1);
 
         long newRowId = db.insert(HistoryContract.TextEntry.TABLE_NAME, null, values);
 
@@ -234,8 +247,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
 
-
     }
+
+
+
+
+
     /*public void onCheckboxClicked(View view, String text, String translatedText, String lang) {
         // Is the view now checked?
         boolean checked = ((CheckBox) view).isChecked();

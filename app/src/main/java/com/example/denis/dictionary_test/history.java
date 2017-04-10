@@ -3,26 +3,22 @@ package com.example.denis.dictionary_test;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.ContentValues;
-import android.database.Cursor;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import com.example.denis.dictionary_test.R;
 import com.example.denis.dictionary_test.data.HistoryContract;
 import com.example.denis.dictionary_test.data.HistoryDbHelper;
+import com.example.denis.dictionary_test.data.favoriteList;
 import com.example.denis.dictionary_test.data.historyList;
 
-import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry._ID;
+import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.COLUMN_FAVORITE;
+import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.COLUMN_INHISTORY;
 
 public class history extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -56,7 +52,11 @@ public class history extends AppCompatActivity {
         }
     }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mHlist.updateList();
+    };
 
     private Fragment createFragment() {
         mHlist = new historyList();
@@ -121,8 +121,10 @@ public class history extends AppCompatActivity {
 
     public void onDeleteClick(View view) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        db.delete(HistoryContract.TextEntry.TABLE_NAME,null,null);
-
+        ContentValues value = new ContentValues();
+        value.put(HistoryContract.TextEntry.COLUMN_INHISTORY, 0);
+        db.delete(HistoryContract.TextEntry.TABLE_NAME,COLUMN_FAVORITE + " = " + 0,null);
+        db.update(HistoryContract.TextEntry.TABLE_NAME,value, null , null );
         mHlist.updateList();
     }
 
@@ -142,5 +144,12 @@ public class history extends AppCompatActivity {
                     " AND " + HistoryContract.TextEntry.COLUMN_TRANSLATED + " = " + "\"" + translated.getText() + "\"" +
                     " AND " + HistoryContract.TextEntry.COLUMN_DIRECTION + " = " + "\"" +direction.getText() + "\"", null );
     }
+
+
+    public void onFavPush(View view) {
+        Intent intent = new Intent(history.this, favoriteList.class);
+        startActivity(intent);
+    }
+
 }
 

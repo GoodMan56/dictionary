@@ -64,7 +64,8 @@ import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.T
         return mInstance;
     }
 
-
+    private static final String SQL_DELETE_ENTRIES =
+            "DROP TABLE IF EXISTS " + TextEntry.TABLE_NAME;
 
 
     @Override
@@ -72,7 +73,7 @@ import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.T
         //Запись в журнал
         Log.w("SQLite", "Обновляемся с версии " + oldVersion + "на версию " + newVersion);
         //Удаление старой таблицы, создание новой
-        db.execSQL("DROP TABLE IF IT EXISTS " + TextEntry.TABLE_NAME);
+        db.execSQL(SQL_DELETE_ENTRIES);
         //Создаем таблицу
         onCreate(db);
     }

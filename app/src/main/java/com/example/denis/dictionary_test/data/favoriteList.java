@@ -1,14 +1,18 @@
 package com.example.denis.dictionary_test.data;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 import com.example.denis.dictionary_test.R;
+import com.example.denis.dictionary_test.history;
 
 /**
  * Created by Denis on 10.04.2017.
@@ -84,4 +88,23 @@ public class favoriteList extends AppCompatActivity {
         listView.requestLayout();
 
     }
+    public void onFavClick(View view) {
+        View listRow = (View) view.getParent().getParent();
+        TextView text = (TextView) listRow.findViewById(R.id.text);
+        TextView translated = (TextView) listRow.findViewById(R.id.translated);
+        TextView direction = (TextView) listRow.findViewById(R.id.direction);
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        ContentValues value = new ContentValues();
+        ContentValues zeroValue = new ContentValues();
+        value.put(HistoryContract.TextEntry.COLUMN_FAVORITE, 1);
+        zeroValue.put(HistoryContract.TextEntry.COLUMN_FAVORITE, 0);
+
+        boolean checked = ((CheckBox) view).isChecked();
+        db.update(HistoryContract.TextEntry.TABLE_NAME, checked ? value : zeroValue , HistoryContract.TextEntry.COLUMN_TEXT + " = " + "\"" + text.getText() + "\"" +
+                " AND " + HistoryContract.TextEntry.COLUMN_TRANSLATED + " = " + "\"" + translated.getText() + "\"" +
+                " AND " + HistoryContract.TextEntry.COLUMN_DIRECTION + " = " + "\"" +direction.getText() + "\"", null );
+        updateList();
+
+    }
+
 }

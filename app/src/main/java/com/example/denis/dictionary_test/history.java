@@ -18,7 +18,6 @@ import com.example.denis.dictionary_test.data.favoriteList;
 import com.example.denis.dictionary_test.data.historyList;
 
 import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.COLUMN_FAVORITE;
-import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.COLUMN_INHISTORY;
 
 public class history extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -28,9 +27,7 @@ public class history extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDbHelper = new HistoryDbHelper(this);
-        //setContentView(R.layout.list_row);
         setContentView(R.layout.activity_fragment);
-        //displayDatabaseInfo();
         final String METHOD = "onCreate(Bundle {" + savedInstanceState + "});";
 
         // Initialize the DB
@@ -56,68 +53,12 @@ public class history extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mHlist.updateList();
-    };
+    }
 
     private Fragment createFragment() {
         mHlist = new historyList();
         return mHlist;
     }
-
-    private void displayDatabaseInfo() {
-
-        //ListView listView = (ListView) findViewById(R.id.list1);
-
-
-
-
-       // TextView displayTextView = (TextView) findViewById(R.id.textView4);
-
-
-
-        /*try {
-            //history mHelp = new history();
-            if(displayTextView == null)
-                Log.e("TextView", "Ошибка курсора");
-            displayTextView.setText("Таблица содержит " + cursor.getCount() + " записей.\n\n");
-            displayTextView.append(HistoryContract.TextEntry._ID + " - " +
-                    HistoryContract.TextEntry.COLUMN_TEXT + " - " +
-                    HistoryContract.TextEntry.COLUMN_TRANSLATED + " - " +
-                    HistoryContract.TextEntry.COLUMN_DIRECTION + " - " +
-                    HistoryContract.TextEntry.COLUMN_FAVORITE + "\n");
-
-            // Узнаем индекс каждого столбца
-            int idColumnIndex = cursor.getColumnIndex(HistoryContract.TextEntry._ID);
-            int textColumnIndex = cursor.getColumnIndex(HistoryContract.TextEntry.COLUMN_TEXT);
-            int translatedColumnIndex = cursor.getColumnIndex(HistoryContract.TextEntry.COLUMN_TRANSLATED);
-            int directionColumnIndex = cursor.getColumnIndex(HistoryContract.TextEntry.COLUMN_DIRECTION);
-            int favColumnIndex = cursor.getColumnIndex(HistoryContract.TextEntry.COLUMN_FAVORITE);
-
-            // Проходим через все ряды
-            while (cursor.moveToNext()) {
-                // Используем индекс для получения строки или числа
-                int currentID = cursor.getInt(idColumnIndex);
-                String currentText = cursor.getString(textColumnIndex);
-                String currentTranslated = cursor.getString(translatedColumnIndex);
-                String currentDirection = cursor.getString(directionColumnIndex);
-                int currentFav = cursor.getInt(favColumnIndex);
-                // Выводим значения каждого столбца
-                /*displayTextView.append(("\n" + currentID + " - " +
-                        currentText + " - " +
-                        currentTranslated + " - " +
-                        currentDirection + " - " +
-                        currentFav));
-                showText.setText(currentText);
-                showTranslate.setText(currentTranslated);
-                showDirection.setText(currentDirection);
-
-            }
-        } finally {
-            // Всегда закрываем курсор после чтения
-            cursor.close();
-        }
-*/
-    }
-
 
     public void onDeleteClick(View view) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();

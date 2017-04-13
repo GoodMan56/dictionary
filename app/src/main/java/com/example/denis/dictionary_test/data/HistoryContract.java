@@ -2,8 +2,6 @@ package com.example.denis.dictionary_test.data;
 
 import android.provider.BaseColumns;
 
-import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.TABLE_NAME;
-
 /**
  * Created by Denis on 28.03.2017.
  */

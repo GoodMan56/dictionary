@@ -126,22 +126,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
 // Add the request to the RequestQueue.
         queue.add(stringRequest);
-
-        //setContentView(R.layout.activity_main);
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
-
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-                startActivity(intent);
-            }
-        });*/
-
-
-
     }
 
 
@@ -180,8 +164,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             String translatedText = jObject.getJSONArray("text").getString(0);
                             mTextView.setText(translatedText);
                             mCheckBox = (CheckBox)findViewById(R.id.checkBox2);
-                            //onCheckboxClicked(mCheckBox, text, translatedText,lang);
-
                             insertText(text, translatedText, lang, 0);
                             mCheckBox.setVisibility(View.VISIBLE);
                         } catch (JSONException e) {
@@ -248,31 +230,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
     }
-
-
-
-
-
-    /*public void onCheckboxClicked(View view, String text, String translatedText, String lang) {
-        // Is the view now checked?
-        boolean checked = ((CheckBox) view).isChecked();
-
-        // Check which checkbox was clicked
-        switch(view.getId()) {
-            case R.id.checkBox:
-                if (checked)
-                    insertText(text, translatedText, lang, 1);
-            else
-                    insertText(text, translatedText, lang, 0);
-                break;
-            case R.id.checkBox2:
-                if (checked)
-                    insertText(text, translatedText, lang, 1);
-            else
-                insertText(text, translatedText, lang, 0);
-                break;
-        }
-    }*/
 
     public void onCheckBoxClick(View view) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();

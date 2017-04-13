@@ -16,18 +16,14 @@ import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.T
 
 
     public class HistoryDbHelper extends  SQLiteOpenHelper{
-    HistoryDbHelper mDbHelper;
 
     private static final String LOG_TAB = HistoryDbHelper.class.getSimpleName();
 
     //Имя файла базы данных
-    private static final String DATABASE_NAME = "history.db";
+    private static final String DATABASE_NAME = "dictionary.db";
 
     private static final int DATABASE_VERSION = 1;
 
-    // The Application Context
-    private Context mContext;
-    private SQLiteDatabase mSQLiteDatabase;
     private static HistoryDbHelper mInstance;
 
     public HistoryDbHelper(Context context) {

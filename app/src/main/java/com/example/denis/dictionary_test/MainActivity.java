@@ -42,8 +42,8 @@ import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry._
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     TextView mTextView;
     HashMap<String, String> map;
-    Spinner spinner;
-    Spinner spinner2;
+    Spinner sourceLang;
+    Spinner translateLang;
     String lang = "ru-en";
     CheckBox mCheckBox;
 
@@ -55,12 +55,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mCheckBox = (CheckBox)findViewById(R.id.checkBox2);
 
         Button fab = (Button) findViewById(R.id.button3);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, history.class);
+                Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
                 startActivity(intent);
             }
         });
@@ -68,23 +69,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mDbHelper = new HistoryDbHelper(this);
 
         mTextView = (TextView)findViewById(R.id.textView2);
-        spinner = (Spinner) findViewById(R.id.spinner);
-        spinner2 = (Spinner) findViewById(R.id.spinner2);
+        sourceLang = (Spinner) findViewById(R.id.spinner);
+        translateLang = (Spinner) findViewById(R.id.spinner2);
         final String[] spinnerArray = {"Русский"};
         String[] spinnerArray2 = {"Английский"};
         ArrayList<String> lst = new ArrayList<String>(Arrays.asList(spinnerArray));
         ArrayList<String> lst2 = new ArrayList<String>(Arrays.asList(spinnerArray2));
-// Create an ArrayAdapter using the string array and a default spinner layout
+// Create an ArrayAdapter using the string array and a default sourceLang layout
         final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lst);
         final ArrayAdapter<String> spinnerArrayAdapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lst2);
 // Specify the layout to use when the list of choices appears
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerArrayAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the spinner
-        spinner.setAdapter(spinnerArrayAdapter);
-        spinner2.setAdapter(spinnerArrayAdapter2);
-        spinner.setOnItemSelectedListener(this);
-        spinner2.setOnItemSelectedListener(this);
+// Apply the adapter to the sourceLang
+        sourceLang.setAdapter(spinnerArrayAdapter);
+        translateLang.setAdapter(spinnerArrayAdapter2);
+        sourceLang.setOnItemSelectedListener(this);
+        translateLang.setOnItemSelectedListener(this);
         RequestQueue queue = Volley.newRequestQueue(this);
         String url ="https://translate.yandex.net/api/v1.5/tr.json/getLangs?key=trnsl.1.1.20170320T132501Z.4f44e2bf3d674771.67b1878acb487684e676c7c4f2fa3badebb57954&ui=ru";
 // Request a string response from the provided URL.
@@ -110,8 +111,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             spinnerArrayAdapter2.clear();
                             spinnerArrayAdapter.addAll(sorted);
                             spinnerArrayAdapter2.addAll(sorted);
-                            spinner.setSelection(spinnerArrayAdapter.getPosition("Русский"));
-                            spinner2.setSelection(spinnerArrayAdapter2.getPosition("Английский"));
+                            sourceLang.setSelection(spinnerArrayAdapter.getPosition("Русский"));
+                            translateLang.setSelection(spinnerArrayAdapter2.getPosition("Английский"));
                         } catch (JSONException e) {
                             mTextView.setText(e.getMessage());
                             e.printStackTrace();
@@ -132,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onItemSelected(AdapterView<?> parent,
                                View itemSelected, int selectedItemPosition, long selectedId) {
         if(map != null)
-            lang = map.get(spinner.getSelectedItem().toString()) + "-" + map.get(spinner2.getSelectedItem().toString());
+            lang = map.get(sourceLang.getSelectedItem().toString()) + "-" + map.get(translateLang.getSelectedItem().toString());
 
 
     }
@@ -163,7 +164,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             jObject = new JSONObject(response);
                             String translatedText = jObject.getJSONArray("text").getString(0);
                             mTextView.setText(translatedText);
-                            mCheckBox = (CheckBox)findViewById(R.id.checkBox2);
                             insertText(text, translatedText, lang, 0);
                             mCheckBox.setVisibility(View.VISIBLE);
                         } catch (JSONException e) {
@@ -184,10 +184,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
 
-    public void Swap(View view) {
-        Integer tem = spinner2.getSelectedItemPosition();
-        spinner2.setSelection(spinner.getSelectedItemPosition());
-        spinner.setSelection(tem);
+    public void swap(View view) {
+        Integer tem = translateLang.getSelectedItemPosition();
+        translateLang.setSelection(sourceLang.getSelectedItemPosition());
+        sourceLang.setSelection(tem);
     }
 
     public void insertText(String text, String translated, String dir, int fav) {

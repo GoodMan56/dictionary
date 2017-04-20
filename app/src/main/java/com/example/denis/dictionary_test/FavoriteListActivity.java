@@ -1,4 +1,4 @@
-package com.example.denis.dictionary_test.data;
+package com.example.denis.dictionary_test;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -11,14 +11,15 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import com.example.denis.dictionary_test.R;
-import com.example.denis.dictionary_test.history;
+import com.example.denis.dictionary_test.data.CheckBoxBinder;
+import com.example.denis.dictionary_test.data.HistoryContract;
+import com.example.denis.dictionary_test.data.HistoryDbHelper;
 
 /**
  * Created by Denis on 10.04.2017.
  */
 
-public class favoriteList extends AppCompatActivity {
+public class FavoriteListActivity extends AppCompatActivity {
     HistoryDbHelper mDbHelper;
     CheckBoxBinder mBinder = new CheckBoxBinder();
     ListView listView;
@@ -86,7 +87,6 @@ public class favoriteList extends AppCompatActivity {
         sca.changeCursor(cursor);
         sca.notifyDataSetChanged();
         listView.requestLayout();
-
     }
     public void onFavClick(View view) {
         View listRow = (View) view.getParent().getParent();
@@ -104,7 +104,6 @@ public class favoriteList extends AppCompatActivity {
                 " AND " + HistoryContract.TextEntry.COLUMN_TRANSLATED + " = " + "\"" + translated.getText() + "\"" +
                 " AND " + HistoryContract.TextEntry.COLUMN_DIRECTION + " = " + "\"" +direction.getText() + "\"", null );
         updateList();
-
     }
 
 }

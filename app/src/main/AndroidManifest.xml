@@ -20,8 +20,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".history"></activity>
-        <activity android:name=".data.favoriteList"></activity>
+        <activity android:name=".HistoryActivity"></activity>
+        <activity android:name=".FavoriteListActivity"></activity>
     </application>
 
 </manifest>

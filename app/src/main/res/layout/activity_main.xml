@@ -79,7 +79,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         android:background="@android:drawable/ic_menu_rotate"
-        android:onClick="Swap"
+        android:onClick="swap"
         app:layout_constraintBottom_toTopOf="@+id/editText"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.181"

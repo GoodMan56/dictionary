@@ -14,15 +14,14 @@ import android.widget.TextView;
 
 import com.example.denis.dictionary_test.data.HistoryContract;
 import com.example.denis.dictionary_test.data.HistoryDbHelper;
-import com.example.denis.dictionary_test.data.favoriteList;
-import com.example.denis.dictionary_test.data.historyList;
+import com.example.denis.dictionary_test.data.HistoryList;
 
 import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.COLUMN_FAVORITE;
 
-public class history extends AppCompatActivity {
+public class HistoryActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     HistoryDbHelper mDbHelper;
-    historyList mHlist;
+    HistoryList mHlist;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +55,7 @@ public class history extends AppCompatActivity {
     }
 
     private Fragment createFragment() {
-        mHlist = new historyList();
+        mHlist = new HistoryList();
         return mHlist;
     }
 
@@ -69,7 +68,7 @@ public class history extends AppCompatActivity {
         mHlist.updateList();
     }
 
-    public void onFavClick(View view) {
+     public void onFavClick(View view) {
         View listRow = (View) view.getParent().getParent();
         TextView text = (TextView) listRow.findViewById(R.id.text);
         TextView translated = (TextView) listRow.findViewById(R.id.translated);
@@ -88,7 +87,7 @@ public class history extends AppCompatActivity {
 
 
     public void onFavPush(View view) {
-        Intent intent = new Intent(history.this, favoriteList.class);
+        Intent intent = new Intent(HistoryActivity.this, FavoriteListActivity.class);
         startActivity(intent);
     }
 

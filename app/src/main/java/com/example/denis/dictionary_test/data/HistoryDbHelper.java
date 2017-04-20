@@ -49,7 +49,7 @@ import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.T
     }
 
     // Зададим условие для выборки - список столбцов
-    String[] projection = {
+    public String[] projection = {
             HistoryContract.TextEntry.COLUMN_TEXT,
             HistoryContract.TextEntry.COLUMN_TRANSLATED,
             HistoryContract.TextEntry.COLUMN_DIRECTION,

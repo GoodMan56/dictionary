@@ -18,7 +18,7 @@ import com.example.denis.dictionary_test.R;
 
 
 
-public class historyList extends Fragment {
+public class HistoryList extends Fragment {
     HistoryDbHelper mDbHelper ;
     CheckBoxBinder mBinder;
     ListView listView;

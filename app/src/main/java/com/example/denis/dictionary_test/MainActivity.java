@@ -52,8 +52,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mCheckBox = (CheckBox)findViewById(R.id.checkBox2);
 
+        mCheckBox = (CheckBox)findViewById(R.id.checkBox2);
+        mTextView = (TextView)findViewById(R.id.textView2);
         Button fab = (Button) findViewById(R.id.button3);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,24 +65,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-        mTextView = (TextView)findViewById(R.id.textView2);
-        sourceLang = (Spinner) findViewById(R.id.spinner);
-        translateLang = (Spinner) findViewById(R.id.spinner2);
-        final String[] spinnerArray = {"Русский"};
-        String[] spinnerArray2 = {"Английский"};
-        ArrayList<String> lst = new ArrayList<String>(Arrays.asList(spinnerArray));
-        ArrayList<String> lst2 = new ArrayList<String>(Arrays.asList(spinnerArray2));
-        // Create an ArrayAdapter using the string array and a default sourceLang layout
-        final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lst);
-        final ArrayAdapter<String> spinnerArrayAdapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lst2);
-        // Specify the layout to use when the list of choices appears
-        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerArrayAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the sourceLang
-        sourceLang.setAdapter(spinnerArrayAdapter);
-        translateLang.setAdapter(spinnerArrayAdapter2);
-        sourceLang.setOnItemSelectedListener(this);
-        translateLang.setOnItemSelectedListener(this);
+        sourceLang = initSpinner(R.id.spinner, "Русский");
+        translateLang = initSpinner(R.id.spinner2, "Английский");
+        final ArrayAdapter<String> sourceLangAdapter = (ArrayAdapter<String>) sourceLang.getAdapter();
+        final ArrayAdapter<String> translateLangAdapter = (ArrayAdapter<String>) sourceLang.getAdapter();
+
         RequestQueue queue = Volley.newRequestQueue(this);
         String url ="https://translate.yandex.net/api/v1.5/tr.json/getLangs?key=trnsl.1.1.20170320T132501Z.4f44e2bf3d674771.67b1878acb487684e676c7c4f2fa3badebb57954&ui=ru";
         // Request a string response from the provided URL.
@@ -103,12 +91,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 sorted.add(value);
                             }
                             Collections.sort(sorted);
-                            spinnerArrayAdapter.clear();
-                            spinnerArrayAdapter2.clear();
-                            spinnerArrayAdapter.addAll(sorted);
-                            spinnerArrayAdapter2.addAll(sorted);
-                            sourceLang.setSelection(spinnerArrayAdapter.getPosition("Русский"));
-                            translateLang.setSelection(spinnerArrayAdapter2.getPosition("Английский"));
+                            sourceLangAdapter.clear();
+                            translateLangAdapter.clear();
+                            sourceLangAdapter.addAll(sorted);
+                            translateLangAdapter.addAll(sorted);
+                            sourceLang.setSelection(sourceLangAdapter.getPosition("Русский"));
+                            translateLang.setSelection(translateLangAdapter.getPosition("Английский"));
                         } catch (JSONException e) {
                             mTextView.setText(e.getMessage());
                             e.printStackTrace();
@@ -125,14 +113,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         queue.add(stringRequest);
     }
 
+    public Spinner initSpinner (int id, String defaultLang){
+        Spinner lang = (Spinner) findViewById(id);
+
+        // Create an ArrayAdapter using the string array and simple_spinner_item layout
+        String[] spinnerArray = {defaultLang};
+        ArrayList<String> lst = new ArrayList<String>(Arrays.asList(spinnerArray));
+        final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lst);
+
+        // Specify the layout to use when the list of choices appears
+        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Apply the adapter
+        lang.setAdapter(spinnerArrayAdapter);
+        lang.setOnItemSelectedListener(this);
+        return lang;
+    }
 
     public void onItemSelected(AdapterView<?> parent,
                                View itemSelected, int selectedItemPosition, long selectedId) {
         if(map != null)
             lang = map.get(sourceLang.getSelectedItem().toString()) + "-" + map.get(translateLang.getSelectedItem().toString());
-
-
     }
+
     public void onNothingSelected(AdapterView<?> parent) {
     }
 
@@ -149,7 +152,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-// Request a string response from the provided URL.
+
+        // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -159,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             jObject = new JSONObject(response);
                             String translatedText = jObject.getJSONArray("text").getString(0);
                             mTextView.setText(translatedText);
-                            insertText(text, translatedText, lang, 0);
+                            insertText(text, translatedText, lang);
                             mCheckBox.setVisibility(View.VISIBLE);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -172,12 +176,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 mTextView.setText("That didn't work!");
             }
         });
-// Add the request to the RequestQueue.
+
+        // Add the request to the RequestQueue.
         queue.add(stringRequest);
 
 
     }
-
 
     public void swap(View view) {
         Integer tem = translateLang.getSelectedItemPosition();
@@ -185,28 +189,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         sourceLang.setSelection(tem);
     }
 
-    public void insertText(String text, String translated, String dir, int fav) {
 
+    public void insertText(String text, String translated, String dir) {
+        //Check if the word already in favorite
         SQLiteDatabase db = HistoryDbHelper.instance(this).getReadableDatabase();
-        Cursor cursor = null;
-        //
-        String orderBy = HistoryContract.TextEntry._ID;
-        // Делаем запрос
-        cursor = db.query(
-                HistoryContract.TextEntry.TABLE_NAME,   // таблица
-                null,            // столбцы
+        Cursor cursor = db.query(
+                HistoryContract.TextEntry.TABLE_NAME,
+                null,
                 HistoryContract.TextEntry.COLUMN_FAVORITE + " = " + 1 +
                         " AND " + HistoryContract.TextEntry.COLUMN_TEXT       + " = " + "\"" + text        + "\"" +
                         " AND " + HistoryContract.TextEntry.COLUMN_TRANSLATED + " = " + "\"" + translated  + "\"" +
-                        " AND " + HistoryContract.TextEntry.COLUMN_DIRECTION  + " = " + "\"" + dir         + "\"",                  // столбцы для условия WHERE
-                null,                  // значения для условия WHERE
-                null,                  // Don't group the rows
-                null,                  // Don't filter by row groups
-                orderBy + " DESC");    // порядок сортировки
-        // Gets the database in write mode
+                        " AND " + HistoryContract.TextEntry.COLUMN_DIRECTION  + " = " + "\"" + dir         + "\"",
+                null,
+                null,
+                null,
+                null);
+
+        //Insert new word to the database
         db = HistoryDbHelper.instance(this).getWritableDatabase();
         mCheckBox.setChecked(cursor.getCount() != 0);
-        // Создаем объект ContentValues
         ContentValues values = new ContentValues();
         values.put(HistoryContract.TextEntry.COLUMN_TEXT, text);
         values.put(HistoryContract.TextEntry.COLUMN_TRANSLATED, translated);
@@ -215,15 +216,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         values.put(HistoryContract.TextEntry.COLUMN_INHISTORY, 1);
 
         long newRowId = db.insert(HistoryContract.TextEntry.TABLE_NAME, null, values);
-
         if (newRowId == -1) {
-            // Если ID  -1, значит произошла ошибка
-            Toast.makeText(this, "Ошибка записи", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "Под номером: " + newRowId, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Database error", Toast.LENGTH_SHORT).show();
         }
-
-
     }
 
     public void onCheckBoxClick(View view) {

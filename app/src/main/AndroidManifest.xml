@@ -13,15 +13,27 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:label="Translator task"
+            android:screenOrientation="portrait"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".HistoryActivity"></activity>
-        <activity android:name=".FavoriteListActivity"></activity>
+        <activity
+            android:name=".HistoryActivity"
+            android:label="History"
+            android:screenOrientation="portrait"
+            ></activity>
+        <activity
+            android:name=".FavoriteListActivity"
+            android:label="Favorite"
+            android:screenOrientation="portrait"
+            ></activity>
     </application>
 
 </manifest>

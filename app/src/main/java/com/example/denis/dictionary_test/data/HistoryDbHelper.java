@@ -17,7 +17,6 @@ import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.T
 
     public class HistoryDbHelper extends  SQLiteOpenHelper{
 
-    private static final String LOG_TAB = HistoryDbHelper.class.getSimpleName();
 
     //Имя файла базы данных
     private static final String DATABASE_NAME = "dictionary.db";

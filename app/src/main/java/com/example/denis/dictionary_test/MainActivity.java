@@ -75,20 +75,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String[] spinnerArray2 = {"Английский"};
         ArrayList<String> lst = new ArrayList<String>(Arrays.asList(spinnerArray));
         ArrayList<String> lst2 = new ArrayList<String>(Arrays.asList(spinnerArray2));
-// Create an ArrayAdapter using the string array and a default sourceLang layout
+        // Create an ArrayAdapter using the string array and a default sourceLang layout
         final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lst);
         final ArrayAdapter<String> spinnerArrayAdapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lst2);
-// Specify the layout to use when the list of choices appears
+        // Specify the layout to use when the list of choices appears
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerArrayAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the sourceLang
+        // Apply the adapter to the sourceLang
         sourceLang.setAdapter(spinnerArrayAdapter);
         translateLang.setAdapter(spinnerArrayAdapter2);
         sourceLang.setOnItemSelectedListener(this);
         translateLang.setOnItemSelectedListener(this);
         RequestQueue queue = Volley.newRequestQueue(this);
         String url ="https://translate.yandex.net/api/v1.5/tr.json/getLangs?key=trnsl.1.1.20170320T132501Z.4f44e2bf3d674771.67b1878acb487684e676c7c4f2fa3badebb57954&ui=ru";
-// Request a string response from the provided URL.
+        // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -148,7 +148,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         RequestQueue queue = Volley.newRequestQueue(this);
         String url ="https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20170320T132501Z.4f44e2bf3d674771.67b1878acb487684e676c7c4f2fa3badebb57954&text=";
         try {
-
             url += URLEncoder.encode(text, "UTF-8");
             url += "&lang=" + lang;
         } catch (UnsupportedEncodingException e) {

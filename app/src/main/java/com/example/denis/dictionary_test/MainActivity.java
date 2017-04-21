@@ -48,9 +48,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     CheckBox mCheckBox;
 
 
-    private HistoryDbHelper mDbHelper;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,11 +59,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
+                intent.putExtra("whereParam", HistoryContract.TextEntry.COLUMN_INHISTORY + " = " + 1);
                 startActivity(intent);
             }
         });
-
-        mDbHelper = new HistoryDbHelper(this);
 
         mTextView = (TextView)findViewById(R.id.textView2);
         sourceLang = (Spinner) findViewById(R.id.spinner);
@@ -191,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void insertText(String text, String translated, String dir, int fav) {
 
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = HistoryDbHelper.instance(this).getReadableDatabase();
         Cursor cursor = null;
         //
         String orderBy = HistoryContract.TextEntry._ID;
@@ -208,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 null,                  // Don't filter by row groups
                 orderBy + " DESC");    // порядок сортировки
         // Gets the database in write mode
-        db = mDbHelper.getWritableDatabase();
+        db = HistoryDbHelper.instance(this).getWritableDatabase();
         mCheckBox.setChecked(cursor.getCount() != 0);
         // Создаем объект ContentValues
         ContentValues values = new ContentValues();
@@ -231,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void onCheckBoxClick(View view) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = HistoryDbHelper.instance(this).getWritableDatabase();
         ContentValues value = new ContentValues();
         ContentValues zeroValue = new ContentValues();
         value.put(HistoryContract.TextEntry.COLUMN_FAVORITE, 1);

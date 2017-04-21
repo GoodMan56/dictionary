@@ -20,22 +20,34 @@ import com.example.denis.dictionary_test.data.HistoryDbHelper;
  */
 
 public class FavoriteListActivity extends AppCompatActivity {
-    HistoryDbHelper mDbHelper;
     CheckBoxBinder mBinder = new CheckBoxBinder();
+    String whereStr;
     ListView listView;
+    int[] resourceIds = {
+            R.id.text,
+            R.id.translated,
+            R.id.direction,
+            R.id.checkBox
+    };
+    SimpleCursorAdapter cursorAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorite);
-        int[] resourceIds = {
-                R.id.text,
-                R.id.translated,
-                R.id.direction,
-                R.id.checkBox
-        };
-        mDbHelper = new HistoryDbHelper(this);
+        whereStr = getIntent().getStringExtra("whereParam");
+        initListView();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateList();
+    }
+
+    public SimpleCursorAdapter initListView() {
+        mBinder = new CheckBoxBinder();
         // Создадим и откроем для чтения базу данных
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = HistoryDbHelper.instance(this).getReadableDatabase();
 
 
         Cursor cursor = null;
@@ -47,7 +59,7 @@ public class FavoriteListActivity extends AppCompatActivity {
         cursor = db.query(
                 HistoryContract.TextEntry.TABLE_NAME,   // таблица
                 null,            // столбцы
-                HistoryContract.TextEntry.COLUMN_FAVORITE + " = " + 1,                  // столбцы для условия WHERE
+                whereStr,                  // столбцы для условия WHERE
                 null,                  // значения для условия WHERE
                 null,                  // Don't group the rows
                 null,                  // Don't filter by row groups
@@ -55,18 +67,19 @@ public class FavoriteListActivity extends AppCompatActivity {
 
 
         // Set the Adapter
-        listView = (ListView) findViewById(R.id.listview_fav);
-        SimpleCursorAdapter cursorAdapter = new SimpleCursorAdapter(this, R.layout.list_row, cursor, mDbHelper.projection, resourceIds, 0);
+        listView = (ListView) findViewById(R.id.listView_text);
+        cursorAdapter = new SimpleCursorAdapter(this, R.layout.list_row, cursor, HistoryDbHelper.instance(this).projection, resourceIds, 0);
         cursorAdapter.setViewBinder(mBinder);
         listView.setAdapter(cursorAdapter);
+        return cursorAdapter;
     }
     public void onDeleteFav(View view) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = HistoryDbHelper.instance(this).getWritableDatabase();
         db.delete(HistoryContract.TextEntry.TABLE_NAME,HistoryContract.TextEntry.COLUMN_FAVORITE + " = " + 1,null);
         updateList();
     }
     public void updateList(){
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = HistoryDbHelper.instance(this).getReadableDatabase();
 
 
         Cursor cursor = null;
@@ -78,7 +91,7 @@ public class FavoriteListActivity extends AppCompatActivity {
         cursor = db.query(
                 HistoryContract.TextEntry.TABLE_NAME,   // таблица
                 null,            // столбцы
-                HistoryContract.TextEntry.COLUMN_FAVORITE + " = " + 1,                  // столбцы для условия WHERE
+                whereStr,                  // столбцы для условия WHERE
                 null,                  // значения для условия WHERE
                 null,                  // Don't group the rows
                 null,                  // Don't filter by row groups
@@ -93,7 +106,7 @@ public class FavoriteListActivity extends AppCompatActivity {
         TextView text = (TextView) listRow.findViewById(R.id.text);
         TextView translated = (TextView) listRow.findViewById(R.id.translated);
         TextView direction = (TextView) listRow.findViewById(R.id.direction);
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = HistoryDbHelper.instance(this).getWritableDatabase();
         ContentValues value = new ContentValues();
         ContentValues zeroValue = new ContentValues();
         value.put(HistoryContract.TextEntry.COLUMN_FAVORITE, 1);

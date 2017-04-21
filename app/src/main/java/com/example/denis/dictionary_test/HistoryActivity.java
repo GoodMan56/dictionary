@@ -19,9 +19,9 @@ import com.example.denis.dictionary_test.data.HistoryDbHelper;
 import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.COLUMN_FAVORITE;
 
 public class HistoryActivity extends AppCompatActivity {
-    HistoryDbHelper mDbHelper;
     CheckBoxBinder mBinder;
     ListView listView;
+    String whereStr;
     SimpleCursorAdapter cursorAdapter;
     // Ruesource id
     int[] resourceIds = {
@@ -33,11 +33,8 @@ public class HistoryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDbHelper = new HistoryDbHelper(this);
+        whereStr = getIntent().getStringExtra("whereParam");
         setContentView(R.layout.activity_history);
-
-        // Initialize the DB
-        HistoryDbHelper.instance(this);
         // Initialize the ListView
         initListView();
 
@@ -50,10 +47,9 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
     public SimpleCursorAdapter initListView() {
-        mDbHelper = new HistoryDbHelper(this);
         mBinder = new CheckBoxBinder();
         // Создадим и откроем для чтения базу данных
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = HistoryDbHelper.instance(this).getReadableDatabase();
 
 
         Cursor cursor = null;
@@ -65,7 +61,7 @@ public class HistoryActivity extends AppCompatActivity {
         cursor = db.query(
                 HistoryContract.TextEntry.TABLE_NAME,   // таблица
                 null,            // столбцы
-                HistoryContract.TextEntry.COLUMN_INHISTORY + " = " + 1,                  // столбцы для условия WHERE
+                whereStr,                  // столбцы для условия WHERE
                 null,                  // значения для условия WHERE
                 null,                  // Don't group the rows
                 null,                  // Don't filter by row groups
@@ -74,14 +70,14 @@ public class HistoryActivity extends AppCompatActivity {
 
         // Set the Adapter
         listView = (ListView) findViewById(R.id.listView_text);
-        cursorAdapter = new SimpleCursorAdapter(this, R.layout.list_row, cursor, mDbHelper.projection, resourceIds, 0);
+        cursorAdapter = new SimpleCursorAdapter(this, R.layout.list_row, cursor, HistoryDbHelper.instance(this).projection, resourceIds, 0);
         cursorAdapter.setViewBinder(mBinder);
         listView.setAdapter(cursorAdapter);
         return cursorAdapter;
     }
 
     public void updateList(){
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = HistoryDbHelper.instance(this).getReadableDatabase();
 
 
         Cursor cursor = null;
@@ -106,7 +102,7 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
     public void onDeleteClick(View view) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = HistoryDbHelper.instance(this).getWritableDatabase();
         ContentValues value = new ContentValues();
         value.put(HistoryContract.TextEntry.COLUMN_INHISTORY, 0);
         db.delete(HistoryContract.TextEntry.TABLE_NAME,COLUMN_FAVORITE + " = " + 0,null);
@@ -119,7 +115,7 @@ public class HistoryActivity extends AppCompatActivity {
         TextView text = (TextView) listRow.findViewById(R.id.text);
         TextView translated = (TextView) listRow.findViewById(R.id.translated);
         TextView direction = (TextView) listRow.findViewById(R.id.direction);
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = HistoryDbHelper.instance(this).getWritableDatabase();
         ContentValues value = new ContentValues();
         ContentValues zeroValue = new ContentValues();
         value.put(HistoryContract.TextEntry.COLUMN_FAVORITE, 1);
@@ -134,6 +130,7 @@ public class HistoryActivity extends AppCompatActivity {
 
     public void onFavPush(View view) {
         Intent intent = new Intent(HistoryActivity.this, FavoriteListActivity.class);
+        intent.putExtra("whereParam", HistoryContract.TextEntry.COLUMN_FAVORITE + " = " + 1);
         startActivity(intent);
     }
 

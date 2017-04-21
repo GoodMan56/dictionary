@@ -25,7 +25,7 @@ import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.T
 
     private static HistoryDbHelper mInstance;
 
-    public HistoryDbHelper(Context context) {
+    private HistoryDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         }
     @Override

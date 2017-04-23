@@ -47,6 +47,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     String lang = "ru-en";
     CheckBox mCheckBox;
 
+    String translateUrl ="https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20170320T132501Z.4f44e2bf3d674771.67b1878acb487684e676c7c4f2fa3badebb57954&text=";
+    String url ="https://translate.yandex.net/api/v1.5/tr.json/getLangs?key=trnsl.1.1.20170320T132501Z.4f44e2bf3d674771.67b1878acb487684e676c7c4f2fa3badebb57954&ui=ru";
+    String defaultSourceLang = "Русский";
+    String defaultTranslateLang = "Английский";
+    String param = "whereParam";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,19 +65,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
-                intent.putExtra("whereParam", HistoryContract.TextEntry.COLUMN_INHISTORY + " = " + 1);
+                intent.putExtra(param, HistoryContract.TextEntry.COLUMN_INHISTORY + " = " + 1);
                 startActivity(intent);
             }
         });
 
-        sourceLang = initSpinner(R.id.spinner, "Русский");
-        translateLang = initSpinner(R.id.spinner2, "Английский");
+        sourceLang = initSpinner(R.id.spinner, defaultSourceLang);
+        translateLang = initSpinner(R.id.spinner2, defaultTranslateLang);
         final ArrayAdapter<String> sourceLangAdapter = (ArrayAdapter<String>) sourceLang.getAdapter();
         final ArrayAdapter<String> translateLangAdapter = (ArrayAdapter<String>) sourceLang.getAdapter();
 
         RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="https://translate.yandex.net/api/v1.5/tr.json/getLangs?key=trnsl.1.1.20170320T132501Z.4f44e2bf3d674771.67b1878acb487684e676c7c4f2fa3badebb57954&ui=ru";
-        // Request a string response from the provided URL.
+
+        //Request a languages list from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -95,8 +100,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             translateLangAdapter.clear();
                             sourceLangAdapter.addAll(sorted);
                             translateLangAdapter.addAll(sorted);
-                            sourceLang.setSelection(sourceLangAdapter.getPosition("Русский"));
-                            translateLang.setSelection(translateLangAdapter.getPosition("Английский"));
+                            sourceLang.setSelection(sourceLangAdapter.getPosition(defaultSourceLang));
+                            translateLang.setSelection(translateLangAdapter.getPosition(defaultTranslateLang));
                         } catch (JSONException e) {
                             mTextView.setText(e.getMessage());
                             e.printStackTrace();
@@ -109,7 +114,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 mTextView.setText("That didn't work!");
             }
         });
-// Add the request to the RequestQueue.
+
+    // Add the request to the RequestQueue.
         queue.add(stringRequest);
     }
 
@@ -119,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // Create an ArrayAdapter using the string array and simple_spinner_item layout
         String[] spinnerArray = {defaultLang};
         ArrayList<String> lst = new ArrayList<String>(Arrays.asList(spinnerArray));
-        final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lst);
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lst);
 
         // Specify the layout to use when the list of choices appears
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -145,16 +151,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20170320T132501Z.4f44e2bf3d674771.67b1878acb487684e676c7c4f2fa3badebb57954&text=";
+
         try {
-            url += URLEncoder.encode(text, "UTF-8");
-            url += "&lang=" + lang;
+            translateUrl += URLEncoder.encode(text, "UTF-8");
+            translateUrl += "&lang=" + lang;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
         // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, translateUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -179,20 +185,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         // Add the request to the RequestQueue.
         queue.add(stringRequest);
-
-
     }
 
+    //Swap spinners languages
     public void swap(View view) {
         Integer tem = translateLang.getSelectedItemPosition();
         translateLang.setSelection(sourceLang.getSelectedItemPosition());
         sourceLang.setSelection(tem);
     }
 
-
     public void insertText(String text, String translated, String dir) {
-        //Check if the word already in favorite
+
+        //Create and open database for reading
         SQLiteDatabase db = HistoryDbHelper.instance(this).getReadableDatabase();
+
+        //Make request
         Cursor cursor = db.query(
                 HistoryContract.TextEntry.TABLE_NAME,
                 null,

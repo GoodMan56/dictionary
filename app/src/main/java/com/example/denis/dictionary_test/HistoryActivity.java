@@ -27,7 +27,6 @@ public class HistoryActivity extends DbListActivityBase {
         updateList();
     }
 
-
     public void onFavPush(View view) {
         Intent intent = new Intent(HistoryActivity.this, FavoriteListActivity.class);
         intent.putExtra("whereParam", HistoryContract.TextEntry.COLUMN_FAVORITE + " = " + 1);

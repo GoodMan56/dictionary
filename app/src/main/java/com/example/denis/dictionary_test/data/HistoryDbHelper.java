@@ -9,16 +9,8 @@ import android.util.Log;
 import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry;
 import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.TABLE_NAME;
 
-
-/**
- * Created by Denis on 28.03.2017.
- */
-
-
     public class HistoryDbHelper extends  SQLiteOpenHelper{
 
-
-    //Имя файла базы данных
     private static final String DATABASE_NAME = "dictionary.db";
 
     private static final int DATABASE_VERSION = 1;
@@ -30,7 +22,8 @@ import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.T
         }
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // Строка для создания таблицы
+
+        //Create table string
         String CREATE_SQL = "CREATE TABLE " + TABLE_NAME +
                 "(" +
                 TextEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
@@ -43,11 +36,11 @@ import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.T
                 TextEntry.COLUMN_TRANSLATED + ", " +
                 TextEntry.COLUMN_DIRECTION + ") ON CONFLICT REPLACE);";
 
-        // Запускаем создание таблицы
+        //Table create
         db.execSQL(CREATE_SQL);
     }
 
-    // Зададим условие для выборки - список столбцов
+    //Set the condition for the selection - the list of columns
     public String[] projection = {
             HistoryContract.TextEntry.COLUMN_TEXT,
             HistoryContract.TextEntry.COLUMN_TRANSLATED,
@@ -55,7 +48,7 @@ import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.T
             HistoryContract.TextEntry.COLUMN_FAVORITE,
             HistoryContract.TextEntry.COLUMN_INHISTORY};
 
-
+    //Singleton
     public static HistoryDbHelper instance(Context context) {
         if (mInstance == null) {
             mInstance = new HistoryDbHelper(context.getApplicationContext());
@@ -66,14 +59,13 @@ import static com.example.denis.dictionary_test.data.HistoryContract.TextEntry.T
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + TextEntry.TABLE_NAME;
 
-
+    //Control over the updating of the database
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        //Запись в журнал
         Log.w("SQLite", "Обновляемся с версии " + oldVersion + "на версию " + newVersion);
-        //Удаление старой таблицы, создание новой
+        //Delete the old table, create a new one
         db.execSQL(SQL_DELETE_ENTRIES);
-        //Создаем таблицу
+        //Table create
         onCreate(db);
     }
 

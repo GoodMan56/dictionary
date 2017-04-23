@@ -7,9 +7,6 @@ import android.view.View;
 import com.example.denis.dictionary_test.data.HistoryContract;
 import com.example.denis.dictionary_test.data.HistoryDbHelper;
 
-/**
- * Created by Denis on 10.04.2017.
- */
 
 public class FavoriteListActivity extends DbListActivityBase {
     @Override
@@ -23,6 +20,4 @@ public class FavoriteListActivity extends DbListActivityBase {
         db.delete(HistoryContract.TextEntry.TABLE_NAME,HistoryContract.TextEntry.COLUMN_FAVORITE + " = " + 1,null);
         updateList();
     }
-
-
 }

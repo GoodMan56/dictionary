@@ -2,10 +2,6 @@ package com.example.denis.dictionary_test.data;
 
 import android.provider.BaseColumns;
 
-/**
- * Created by Denis on 28.03.2017.
- */
-
 public final class HistoryContract {
     private HistoryContract(){
     };

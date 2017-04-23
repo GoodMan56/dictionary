@@ -7,10 +7,7 @@ import android.widget.SimpleCursorAdapter;
 
 import com.example.denis.dictionary_test.R;
 
-/**
- * Created by Denis on 04.04.2017.
- */
-
+//Translating the value from the database to the checkbox state
 public class CheckBoxBinder implements SimpleCursorAdapter.ViewBinder {
     @Override
     public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
@@ -19,7 +16,6 @@ public class CheckBoxBinder implements SimpleCursorAdapter.ViewBinder {
             checkBox.setChecked(cursor.getInt(columnIndex)!=0);
             return true;
         }
-
         return false;
     }
 }

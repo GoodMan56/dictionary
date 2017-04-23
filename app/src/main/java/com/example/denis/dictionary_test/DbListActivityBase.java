@@ -15,15 +15,13 @@ import com.example.denis.dictionary_test.data.CheckBoxBinder;
 import com.example.denis.dictionary_test.data.HistoryContract;
 import com.example.denis.dictionary_test.data.HistoryDbHelper;
 
-/**
- * Created by Denis on 21.04.2017.
- */
-
 public class DbListActivityBase extends AppCompatActivity {
     CheckBoxBinder mBinder;
     ListView listView;
     String whereStr;
+    String param = "whereParam";
     SimpleCursorAdapter cursorAdapter;
+
     // Ruesource id
     int[] resourceIds = {
             R.id.text,
@@ -34,7 +32,7 @@ public class DbListActivityBase extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        whereStr = getIntent().getStringExtra("whereParam");
+        whereStr = getIntent().getStringExtra(param);
         initListView();
     }
 
@@ -46,24 +44,20 @@ public class DbListActivityBase extends AppCompatActivity {
 
     public SimpleCursorAdapter initListView() {
         mBinder = new CheckBoxBinder();
-        // Создадим и откроем для чтения базу данных
+
+        //Create and open database for reading
         SQLiteDatabase db = HistoryDbHelper.instance(this).getReadableDatabase();
-
-
-        Cursor cursor = null;
-        //
-
-
         String orderBy = HistoryContract.TextEntry._ID;
-        // Делаем запрос
-        cursor = db.query(
-                HistoryContract.TextEntry.TABLE_NAME,   // таблица
-                null,            // столбцы
-                whereStr,                  // столбцы для условия WHERE
-                null,                  // значения для условия WHERE
-                null,                  // Don't group the rows
-                null,                  // Don't filter by row groups
-                orderBy + " DESC");              // порядок сортировки
+
+        //Making request
+        Cursor cursor = db.query(
+                HistoryContract.TextEntry.TABLE_NAME,
+                null,
+                whereStr,
+                null,
+                null,
+                null,
+                orderBy + " DESC");
 
 
         // Set the Adapter
@@ -73,29 +67,25 @@ public class DbListActivityBase extends AppCompatActivity {
         listView.setAdapter(cursorAdapter);
         return cursorAdapter;
     }
+
+    //Update words listview
     public void updateList(){
         SQLiteDatabase db = HistoryDbHelper.instance(this).getReadableDatabase();
-
-
-        Cursor cursor = null;
-        //
-
-
         String orderBy = HistoryContract.TextEntry._ID;
-        // Делаем запрос
-        cursor = db.query(
-                HistoryContract.TextEntry.TABLE_NAME,   // таблица
-                null,            // столбцы
-                whereStr,                  // столбцы для условия WHERE
-                null,                  // значения для условия WHERE
-                null,                  // Don't group the rows
-                null,                  // Don't filter by row groups
-                orderBy + " DESC");              // порядок сортировки
+        Cursor cursor = db.query(
+                HistoryContract.TextEntry.TABLE_NAME,
+                null,
+                whereStr,
+                null,
+                null,
+                null,
+                orderBy + " DESC");
         SimpleCursorAdapter sca = (SimpleCursorAdapter) listView.getAdapter();
         sca.changeCursor(cursor);
         sca.notifyDataSetChanged();
         listView.requestLayout();
     }
+
     public void onFavClick(View view) {
         View listRow = (View) view.getParent().getParent();
         TextView text = (TextView) listRow.findViewById(R.id.text);

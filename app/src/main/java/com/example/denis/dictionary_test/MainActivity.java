@@ -58,6 +58,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Create an ArrayAdapter using the string array and simple_spinner_item layout
+        String[] spinnerSourceArray = {defaultSourceLang};
+        String[] spinnerTranslateArray = {defaultTranslateLang};
+        ArrayList<String> lstSr = new ArrayList<String>(Arrays.asList(spinnerSourceArray));
+        ArrayList<String> lstTr = new ArrayList<String>(Arrays.asList(spinnerTranslateArray));
+        ArrayAdapter<String> spinnerSourceArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lstSr);
+        ArrayAdapter<String> spinnerTranslateArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lstTr);
+
         mCheckBox = (CheckBox)findViewById(R.id.checkBox2);
         mTextView = (TextView)findViewById(R.id.textView2);
         Button fab = (Button) findViewById(R.id.button3);
@@ -70,8 +78,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-        sourceLang = initSpinner(R.id.spinner, defaultSourceLang);
-        translateLang = initSpinner(R.id.spinner2, defaultTranslateLang);
+        sourceLang = initSpinner(R.id.spinner, spinnerSourceArrayAdapter);
+        translateLang = initSpinner(R.id.spinner2, spinnerTranslateArrayAdapter);
         final ArrayAdapter<String> sourceLangAdapter = (ArrayAdapter<String>) sourceLang.getAdapter();
         final ArrayAdapter<String> translateLangAdapter = (ArrayAdapter<String>) sourceLang.getAdapter();
 
@@ -119,19 +127,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         queue.add(stringRequest);
     }
 
-    public Spinner initSpinner (int id, String defaultLang){
+    public Spinner initSpinner (int id,  ArrayAdapter<String> adapter){
         Spinner lang = (Spinner) findViewById(id);
 
-        // Create an ArrayAdapter using the string array and simple_spinner_item layout
-        String[] spinnerArray = {defaultLang};
-        ArrayList<String> lst = new ArrayList<String>(Arrays.asList(spinnerArray));
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lst);
-
         // Specify the layout to use when the list of choices appears
-        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         // Apply the adapter
-        lang.setAdapter(spinnerArrayAdapter);
+        lang.setAdapter(adapter);
         lang.setOnItemSelectedListener(this);
         return lang;
     }

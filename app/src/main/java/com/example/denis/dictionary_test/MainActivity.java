@@ -58,13 +58,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Create an ArrayAdapter using the string array and simple_spinner_item layout
-        String[] spinnerSourceArray = {defaultSourceLang};
-        String[] spinnerTranslateArray = {defaultTranslateLang};
-        ArrayList<String> lstSr = new ArrayList<String>(Arrays.asList(spinnerSourceArray));
-        ArrayList<String> lstTr = new ArrayList<String>(Arrays.asList(spinnerTranslateArray));
-        ArrayAdapter<String> spinnerSourceArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lstSr);
-        ArrayAdapter<String> spinnerTranslateArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lstTr);
+
 
         mCheckBox = (CheckBox)findViewById(R.id.checkBox2);
         mTextView = (TextView)findViewById(R.id.textView2);
@@ -78,12 +72,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-        sourceLang = initSpinner(R.id.spinner, spinnerSourceArrayAdapter);
-        translateLang = initSpinner(R.id.spinner2, spinnerTranslateArrayAdapter);
-        final ArrayAdapter<String> sourceLangAdapter = (ArrayAdapter<String>) sourceLang.getAdapter();
-        final ArrayAdapter<String> translateLangAdapter = (ArrayAdapter<String>) sourceLang.getAdapter();
+        mTextView = (TextView)findViewById(R.id.textView2);
+        sourceLang = (Spinner) findViewById(R.id.spinner);
+        translateLang = (Spinner) findViewById(R.id.spinner2);
+        String[] sourceLangArray = {defaultSourceLang};
+        String[] translateLangArray = {defaultTranslateLang};
+        ArrayList<String> lst = new ArrayList<String>(Arrays.asList(sourceLangArray));
+        ArrayList<String> lst2 = new ArrayList<String>(Arrays.asList(translateLangArray));
 
+        // Create an ArrayAdapter using the string array and a default sourceLang layout
+        final ArrayAdapter<String> spinnerSourceArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lst);
+        final ArrayAdapter<String> spinnerTranslateArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lst2);
+
+        // Specify the layout to use when the list of choices appears
+        spinnerSourceArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerTranslateArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Apply the adapter to the sourceLang
+        sourceLang.setAdapter(spinnerSourceArrayAdapter);
+        translateLang.setAdapter(spinnerTranslateArrayAdapter);
+        sourceLang.setOnItemSelectedListener(this);
+        translateLang.setOnItemSelectedListener(this);
         RequestQueue queue = Volley.newRequestQueue(this);
+
 
         //Request a languages list from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -104,12 +115,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 sorted.add(value);
                             }
                             Collections.sort(sorted);
-                            sourceLangAdapter.clear();
-                            translateLangAdapter.clear();
-                            sourceLangAdapter.addAll(sorted);
-                            translateLangAdapter.addAll(sorted);
-                            sourceLang.setSelection(sourceLangAdapter.getPosition(defaultSourceLang));
-                            translateLang.setSelection(translateLangAdapter.getPosition(defaultTranslateLang));
+                            spinnerSourceArrayAdapter.clear();
+                            spinnerTranslateArrayAdapter.clear();
+                            spinnerSourceArrayAdapter.addAll(sorted);
+                            spinnerTranslateArrayAdapter.addAll(sorted);
+                            sourceLang.setSelection(spinnerSourceArrayAdapter.getPosition(defaultSourceLang));
+                            translateLang.setSelection(spinnerTranslateArrayAdapter.getPosition(defaultTranslateLang));
                         } catch (JSONException e) {
                             mTextView.setText(e.getMessage());
                             e.printStackTrace();
@@ -127,17 +138,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         queue.add(stringRequest);
     }
 
-    public Spinner initSpinner (int id,  ArrayAdapter<String> adapter){
-        Spinner lang = (Spinner) findViewById(id);
-
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        // Apply the adapter
-        lang.setAdapter(adapter);
-        lang.setOnItemSelectedListener(this);
-        return lang;
-    }
 
     public void onItemSelected(AdapterView<?> parent,
                                View itemSelected, int selectedItemPosition, long selectedId) {
